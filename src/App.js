@@ -1,25 +1,51 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Suspense } from 'react'
+import { DoubleSide } from 'three';
+import { VRCanvas, VRButton, ARButton, XR, Controllers, Hands, DefaultXRControllers, RayGrab } from '@react-three/xr'
+import TeleportTravel from './TeleportTravel';
+import BallPit from './BallPit';
+import MovementController from './MovementController';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+function Floor(props) {
+	return (
+		<mesh rotation={[-Math.PI / 2, 0, 0]} {...props}>
+			<planeBufferGeometry args={[10, 10]} attach="geometry" />
+			<meshBasicMaterial attach="material" color={'#25282F'} />
+		</mesh>
+	);
 }
 
-export default App;
+function Cage(props) {
+	return (
+		<mesh {...props}>
+			<sphereBufferGeometry args={[15, 32, 16]} attach="geometry" />
+			<meshBasicMaterial
+				attach="material"
+				color={'#001219'}
+				side={DoubleSide}
+			/>
+		</mesh>
+	);
+}
+
+function App() {
+	return (
+		<VRCanvas>
+			<TeleportTravel useNormal={true}>
+				<Floor rotation={[-Math.PI / 2, 0, 0]} />
+			</TeleportTravel>
+			<MovementController />
+			<MovementController
+				hand="left"
+				applyRotation={false}
+				applyHorizontal={true}
+			/>
+			<DefaultXRControllers />
+			<Suspense fallback={null} r3f>
+				<BallPit position={[0, 3, 0]} />
+			</Suspense>
+			<Cage />
+		</VRCanvas>
+	);
+}
+
+export default App
